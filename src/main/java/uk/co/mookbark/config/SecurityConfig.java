@@ -6,6 +6,8 @@ import com.nimbusds.jose.jwk.RSAKey;
 import com.nimbusds.jose.jwk.source.ImmutableJWKSet;
 import com.nimbusds.jose.jwk.source.JWKSource;
 import com.nimbusds.jose.proc.SecurityContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.Customizer;
@@ -31,6 +33,7 @@ import java.util.Optional;
 @EnableWebSecurity
 public class SecurityConfig {
 
+    private static final Logger LOG = LoggerFactory.getLogger(SecurityConfig.class);
     private final RsaKeyProperties rsaKeys;
 
     public SecurityConfig(RsaKeyProperties rsaKeys) {
@@ -54,10 +57,12 @@ public class SecurityConfig {
                 .build();
     }
 
-
+    @Bean
     public UserDetailsService userDetailsService(UserRepository userRepository) {
+        LOG.warn("Create userDetailsService");
         return username -> {
             Optional<User> user = userRepository.findByUsername(username);
+            LOG.warn("Arrive at userDetailsService with username " + username + " where user is " + (user.isPresent() ? "present" : "missing"));
             if (user.isPresent()){
                 return user.get();
             }

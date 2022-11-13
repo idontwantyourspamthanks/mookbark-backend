@@ -2,6 +2,7 @@ package uk.co.mookbark.controller;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import uk.co.mookbark.model.User;
@@ -19,13 +20,20 @@ public class TestController {
 
     private final UserRepository userRepository;
 
-    public TestController(UserRepository userRepository) {
+    private final PasswordEncoder passwordEncoder;
+
+    public TestController(UserRepository userRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @RequestMapping("/test")
     public String getUsers() {
         LOG.warn("Got to /test");
+        String encode = this.passwordEncoder.encode("letmein");
+        boolean match = this.passwordEncoder.matches("letmein", encode);
+        LOG.warn("match is " + match);
+
         List<User> users = StreamSupport.stream(this.userRepository.findAll().spliterator(), false).toList();
         return "Users are " + users.stream().map(u -> u.getUsername() + " - " + u.getEmail()).collect(Collectors.joining(" :: "));
     }

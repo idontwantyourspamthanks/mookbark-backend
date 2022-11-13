@@ -13,13 +13,19 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.oauth2.server.resource.OAuth2ResourceServerConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
+import uk.co.mookbark.model.User;
+import uk.co.mookbark.repository.UserRepository;
+
+import java.util.Optional;
 
 @Configuration
 @EnableWebSecurity
@@ -36,7 +42,10 @@ public class SecurityConfig {
         // Note: Disabling CSRF is fine as long as we also disable sessions
         return http
                 .csrf(csrf -> csrf.disable()) // Disable CSRF
-                .authorizeRequests(auth -> auth.anyRequest().authenticated()) // All requests should be authenticated
+                .authorizeRequests()
+                    .antMatchers("/auth/token", "/register", "/test/**").permitAll()
+                    .antMatchers("/", "/**").hasRole("USER")
+                .and()
                 .oauth2ResourceServer(OAuth2ResourceServerConfigurer::jwt)
                 .sessionManagement(
                         session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
@@ -45,16 +54,22 @@ public class SecurityConfig {
                 .build();
     }
 
-    @Bean
-    public InMemoryUserDetailsManager users() {
-        return new InMemoryUserDetailsManager(
-                User.withUsername("ryan")
-                        .password("{noop}letmein") //{noop} saves us some hassle making a NoOpPasswordEncoder bean
-                        .authorities("read")
-                        .build()
-        );
+
+    public UserDetailsService userDetailsService(UserRepository userRepository) {
+        return username -> {
+            Optional<User> user = userRepository.findByUsername(username);
+            if (user.isPresent()){
+                return user.get();
+            }
+
+            throw new UsernameNotFoundException("User " + username + " not found");
+        };
     }
 
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
     @Bean
     JwtDecoder jwtDecoder() {
         return NimbusJwtDecoder.withPublicKey(this.rsaKeys.publicKey()).build();

@@ -20,3 +20,6 @@ Finally we need our key in the right format.
  - ```openssl pkcs8 -topk8 -inform PEM -outform PEM -nocrypt -in keypair.pem -out private.pem```
 
 Now public.pem is not needed.
+
+## Temporary root user
+root:letmein

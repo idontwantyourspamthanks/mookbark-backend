@@ -15,7 +15,7 @@ import java.util.List;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED, force = true)
 @RequiredArgsConstructor
-public class DAOUser implements UserDetails {
+public class DAOUser implements UserDetails, DAOBase {
 
     @Id
     @GeneratedValue(strategy= GenerationType.AUTO)

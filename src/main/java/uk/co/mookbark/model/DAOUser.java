@@ -9,14 +9,13 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import java.util.Arrays;
 import java.util.List;
 
-@Entity
+@Entity(name = "user")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED, force = true)
 @RequiredArgsConstructor
-public class User implements UserDetails {
+public class DAOUser implements UserDetails {
 
     @Id
     @GeneratedValue(strategy= GenerationType.AUTO)

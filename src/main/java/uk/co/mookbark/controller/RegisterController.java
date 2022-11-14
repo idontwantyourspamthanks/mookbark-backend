@@ -6,7 +6,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 import uk.co.mookbark.controller.input.RegistrationForm;
-import uk.co.mookbark.model.User;
+import uk.co.mookbark.model.DAOUser;
 import uk.co.mookbark.repository.UserRepository;
 
 @RestController()
@@ -25,7 +25,7 @@ public class RegisterController {
     @PostMapping("/register")
     public String processRegistration(RegistrationForm form) {
         LOG.warn("Reached register with " + form);
-        User user = userRepository.save(form.toUser(passwordEncoder));
+        DAOUser user = userRepository.save(form.toUser(passwordEncoder));
         return user.getId() + "";
     }
 

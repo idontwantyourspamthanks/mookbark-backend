@@ -24,7 +24,7 @@ import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import uk.co.mookbark.model.User;
+import uk.co.mookbark.model.DAOUser;
 import uk.co.mookbark.repository.UserRepository;
 
 import java.util.Optional;
@@ -47,7 +47,8 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable()) // Disable CSRF
                 .authorizeRequests()
                     .antMatchers("/auth/token", "/register", "/test/**").permitAll()
-                    .antMatchers("/", "/**").hasRole("USER")
+                    .antMatchers("/", "/**").authenticated()
+                    .anyRequest().authenticated()
                 .and()
                 .oauth2ResourceServer(OAuth2ResourceServerConfigurer::jwt)
                 .sessionManagement(
@@ -57,11 +58,12 @@ public class SecurityConfig {
                 .build();
     }
 
+
     @Bean
     public UserDetailsService userDetailsService(UserRepository userRepository) {
         LOG.warn("Create userDetailsService");
         return username -> {
-            Optional<User> user = userRepository.findByUsername(username);
+            Optional<DAOUser> user = userRepository.findByUsername(username);
             LOG.warn("Arrive at userDetailsService with username " + username + " where user is " + (user.isPresent() ? "present" : "missing"));
             if (user.isPresent()){
                 return user.get();

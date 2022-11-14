@@ -2,7 +2,7 @@ package uk.co.mookbark.controller.input;
 
 import lombok.Data;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import uk.co.mookbark.model.User;
+import uk.co.mookbark.model.DAOUser;
 
 @Data
 public class RegistrationForm {
@@ -13,8 +13,8 @@ public class RegistrationForm {
     private String lastName;
     private String email;
 
-    public User toUser(PasswordEncoder passwordEncoder) {
-        return new User(username, passwordEncoder.encode(password), firstName, lastName, email);
+    public DAOUser toUser(PasswordEncoder passwordEncoder) {
+        return new DAOUser(username, passwordEncoder.encode(password), firstName, lastName, email);
     }
 
 }

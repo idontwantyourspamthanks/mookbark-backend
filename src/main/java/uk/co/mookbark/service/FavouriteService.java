@@ -9,7 +9,12 @@ import java.util.List;
 @Service
 public class FavouriteService extends BaseService<DAOFavourite> {
 
-    FavouriteRepository repository;
+    private final FavouriteRepository repository;
+
+    public FavouriteService(FavouriteRepository repository) {
+        this.repository = repository;
+    }
+
     public List<DAOFavourite> findByUser(Long id) {
         return this.repository.findByOwnerId(id);
     }

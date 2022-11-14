@@ -1,5 +1,6 @@
 package uk.co.mookbark.controller;
 
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -16,8 +17,10 @@ public class FavouritesConroller {
     }
 
     @GetMapping("/favourites/all")
-    public String allFavourites(@AuthenticationPrincipal DAOUser user) {
-        return this.favouriteService.findByUser(user.getId()).toString();
+    public String allFavourites(Authentication user) {
+        System.out.println("User is " + user);
+        return "Hello";
+//        return this.favouriteService.findByUser(user.getId()).toString();
     }
 
 }
